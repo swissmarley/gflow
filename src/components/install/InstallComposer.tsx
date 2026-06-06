@@ -13,7 +13,13 @@ const COPY_LABELS: Record<CopyState, string> = {
   manual: "Command selected for manual copy"
 };
 
-export function InstallComposer({ label }: { label: string }) {
+export function InstallComposer({
+  label,
+  showPackageManager = true
+}: {
+  label: string;
+  showPackageManager?: boolean;
+}) {
   const { command } = useInstallConfig();
   const commandRef = useRef<HTMLElement>(null);
   const timerRef = useRef<number | undefined>(undefined);
@@ -54,7 +60,7 @@ export function InstallComposer({ label }: { label: string }) {
   return (
     <div aria-label={label} className="install-composer">
       <div className="install-controls">
-        <PackageManagerSelect />
+        {showPackageManager && <PackageManagerSelect />}
         <AgentSelect />
       </div>
       <div className="command-field">

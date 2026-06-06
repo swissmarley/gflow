@@ -1,5 +1,6 @@
 import { ArrowDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { asset } from "../asset";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { InstallComposer } from "./install/InstallComposer";
 
@@ -12,7 +13,24 @@ export function PortalHero() {
   useEffect(() => {
     const video = videoRef.current;
     if (!video || reducedMotion) return;
-    video.play().catch(() => setVideoReady(false));
+
+    const play = () => {
+      video.play().catch(() => undefined);
+    };
+    play();
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") play();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    video.addEventListener("canplay", play);
+    video.addEventListener("pause", play);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      video.removeEventListener("canplay", play);
+      video.removeEventListener("pause", play);
+    };
   }, [reducedMotion]);
 
   useEffect(() => {
@@ -26,7 +44,7 @@ export function PortalHero() {
         1,
         Math.max(0, -hero.getBoundingClientRect().top / window.innerHeight)
       );
-      hero.style.setProperty("--hero-scale", String(1 + progress * 0.075));
+      hero.style.setProperty("--hero-scale", String(1 + progress * 0.05));
       hero.style.setProperty("--hero-copy-y", `${progress * -52}px`);
       hero.style.setProperty(
         "--hero-copy-opacity",
@@ -58,7 +76,7 @@ export function PortalHero() {
       aria-labelledby="hero-title"
     >
       <div className="portal-media" aria-hidden="true">
-        <img src="/media/portal-poster.jpg" alt="" />
+        <img src={asset("media/portal-poster.jpg")} alt="" />
         {!reducedMotion && (
           <video
             ref={videoRef}
@@ -66,26 +84,22 @@ export function PortalHero() {
             loop
             playsInline
             preload="metadata"
-            poster="/media/portal-poster.jpg"
+            poster={asset("media/portal-poster.jpg")}
             onCanPlay={() => setVideoReady(true)}
             className={videoReady ? "is-ready" : ""}
           >
-            <source src="/media/portal-film.webm" type="video/webm" />
-            <source src="/media/portal-film.mp4" type="video/mp4" />
+            <source src={asset("media/portal-film.webm")} type="video/webm" />
+            <source src={asset("media/portal-film.mp4")} type="video/mp4" />
           </video>
         )}
       </div>
       <div className="hero-vignette" aria-hidden="true" />
-      <div className="hero-orbit" aria-hidden="true">
-        <span />
-        <span />
-      </div>
       <div className="hero-content">
-        <h1 id="hero-title">From prompt to world.</h1>
-        <InstallComposer label="Hero installer" />
+        <h1 id="hero-title">Run Flow like a studio.</h1>
+        <InstallComposer label="Hero installer" showPackageManager={false} />
         <p className="hero-support">
-          Authenticated Flow control and twelve quality-gated creative skills,
-          installed together.
+          Authenticated Flow control plus twelve quality-gated creative skills
+          for your coding agent.
         </p>
       </div>
       <a className="scroll-cue" href="#products">

@@ -4,4 +4,4 @@ dist/
 .DS_Store
 *.tsbuildinfo
 .playwright-cli/
-
+.worktrees/
